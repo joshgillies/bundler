@@ -1,0 +1,65 @@
+var document = require('global/document')
+var Bundler = require('node-matrix-bundler')
+var concat = require('concat-stream')
+var hg = require('mercury')
+var h = require('mercury').h
+
+var File = require('./file.js')
+var bundle = Bundler()
+
+function Bundle (opts) {
+  opts = opts || {}
+
+  return hg.state({
+    title: hg.value('export'),
+    files: hg.varhash(opts.files || {}, File),
+    channels: {
+      add: add,
+      remove: remove,
+      download: download
+    }
+  })
+}
+
+function add (state, data) {
+  var file = File({
+    path: data.path,
+    contents: data.contents
+  })
+  state.files.put(file.id(), file)
+}
+
+function remove (state, file) {
+  state.files.delete(file.id())
+}
+
+function download (state) {
+  Object.keys(state.files).forEach(function addFiles (file) {
+    file = state.files[file]
+    bundle.add(file.path(), file.contents())
+  })
+
+  bundle.createBundle().pipe(concat(function downloadBundle (buf) {
+    var link = document.createElement('a')
+    link.href = 'data:application/gzip;base64,' + buf.toString('base64')
+    link.download = state.title() + '.tgz'
+    link.click()
+  }))
+}
+
+Bundle.render = function render (state) {
+  return h('div', [
+    h('ul', Object.keys(state.files)
+      .map(function renderFile (file) {
+        return File.render(state.files[file])
+      })
+    ),
+    h('input.button', {
+      type: 'button',
+      value: 'Download!',
+      'ev-click': hg.send(state.channels.download)
+    })
+  ])
+}
+
+hg.app(document.body, Bundle(), Bundle.render)

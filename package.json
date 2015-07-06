@@ -36,6 +36,7 @@
   "dependencies": {
     "basscss": "^7.0.0",
     "concat-stream": "^1.5.0",
+    "cuid": "^1.2.5",
     "drag-drop": "^2.2.3",
     "global": "^4.3.0",
     "mercury": "^14.0.0",
