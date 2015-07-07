@@ -16,7 +16,8 @@ function Bundle (opts) {
     channels: {
       add: add,
       remove: remove,
-      download: download
+      download: download,
+      changeTitle: changeTitle
     }
   })
 }
@@ -47,14 +48,24 @@ function download (state) {
   }))
 }
 
+function changeTitle (state, data) {
+  state.title.set(data.title)
+}
+
 Bundle.render = function render (state) {
   return h('div', [
+    h('input', {
+      type: 'text',
+      value: state.title,
+      name: 'title',
+      'ev-event': hg.sendChange(state.channels.changeTitle)
+    }),
     h('ul', Object.keys(state.files)
       .map(function renderFile (file) {
         return File.render(state.files[file])
       })
     ),
-    h('input.button', {
+    h('input', {
       type: 'button',
       value: 'Download!',
       'ev-click': hg.send(state.channels.download)
