@@ -65,6 +65,24 @@ Bundle.render = function render (state) {
         return File.render(state.files[file])
       })
     ),
+    h('form', {
+      'ev-event': hg.sendSubmit(state.channels.add)
+    }, [
+      h('input', {
+        type: 'text',
+        name: 'path',
+        value: 'file.txt'
+      }),
+      h('input', {
+        type: 'text',
+        name: 'contents',
+        value: 'file comtent'
+      }),
+      h('input', {
+        type: 'submit',
+        value: 'add'
+      })
+    ]),
     h('input', {
       type: 'button',
       value: 'Download!',
