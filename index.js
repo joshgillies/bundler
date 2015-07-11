@@ -4,6 +4,7 @@ var concat = require('concat-stream')
 var hg = require('mercury')
 var h = require('mercury').h
 
+var FileImporter = require('./fileimporter.js')
 var File = require('./file.js')
 var bundle = Bundler()
 
@@ -71,12 +72,14 @@ Bundle.render = function render (state) {
       h('input', {
         type: 'text',
         name: 'path',
-        value: 'file.txt'
+        placeholder: 'file.txt',
+        required: true
       }),
       h('input', {
         type: 'text',
         name: 'contents',
-        value: 'file comtent'
+        placeholder: 'file content',
+        required: true
       }),
       h('input', {
         type: 'submit',
@@ -87,7 +90,8 @@ Bundle.render = function render (state) {
       type: 'button',
       value: 'Download!',
       'ev-click': hg.send(state.channels.download)
-    })
+    }),
+    new FileImporter(state.channels.add)
   ])
 }
 
