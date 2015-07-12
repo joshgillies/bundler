@@ -1,10 +1,10 @@
 var document = require('global/document')
+var dragDrop = require('drag-drop/buffer')
 var Bundler = require('node-matrix-bundler')
 var concat = require('concat-stream')
 var hg = require('mercury')
 var h = require('mercury').h
 
-var FileImporter = require('./fileimporter.js')
 var File = require('./file.js')
 var bundle = Bundler()
 
@@ -14,6 +14,7 @@ function Bundle (opts) {
   return hg.state({
     title: hg.value('export'),
     files: hg.varhash(opts.files || {}, File),
+    droppable: hg.value(false),
     channels: {
       add: add,
       remove: remove,
@@ -91,8 +92,38 @@ Bundle.render = function render (state) {
       value: 'Download!',
       'ev-click': hg.send(state.channels.download)
     }),
-    new FileImporter(state.channels.add)
+    hg.partial(function dropArea (ready) {
+      return h('div', {
+        style: {
+          height: '100px'
+        },
+        'ev-import': new ImportHook(ready)
+      })
+    }, state.droppable)
   ])
 }
 
-hg.app(document.body, Bundle(), Bundle.render)
+var globalState = Bundle()
+
+function ImportHook (ready) {
+  this.ready = ready
+}
+
+ImportHook.prototype.hook = function hook (elem) {
+  if (this.ready) {
+    return
+  }
+
+  dragDrop(elem, function getFiles (files) {
+    files.forEach(function processFile (file) {
+      add(globalState, {
+        path: file.name,
+        contents: file
+      })
+    })
+  })
+
+  globalState.droppable.set(true)
+}
+
+hg.app(document.body, globalState, Bundle.render)
