@@ -92,29 +92,28 @@ Bundle.render = function render (state) {
       value: 'Download!',
       'ev-click': hg.send(state.channels.download)
     }),
-    hg.partial(function dropArea (ready) {
-      return h('div', {
+    hg.partial(function importArea (ready) {
+      var attributes = {
         style: {
           height: '100px'
-        },
-        'ev-import': new ImportHook(ready)
-      })
+        }
+      }
+
+      if (!ready) {
+        attributes['ev-import'] = new ImportHook()
+      }
+
+      return h('div', attributes)
     }, state.droppable)
   ])
 }
 
 var globalState = Bundle()
 
-function ImportHook (ready) {
-  this.ready = ready
-}
+function ImportHook () {}
 
-ImportHook.prototype.hook = function hook (elem) {
-  if (this.ready) {
-    return
-  }
-
-  dragDrop(elem, function getFiles (files) {
+ImportHook.prototype.hook = function hook (node) {
+  dragDrop(node, function getFiles (files) {
     files.forEach(function processFile (file) {
       add(globalState, {
         path: file.name,
