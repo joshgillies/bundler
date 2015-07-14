@@ -25,10 +25,12 @@ function Bundle (opts) {
 }
 
 function add (state, data) {
-  var file = File({
-    path: data.path,
-    contents: data.contents
-  })
+  if (!data.size) {
+    data.size = data.contents.length
+  }
+
+  var file = File(data)
+
   state.files.put(file.id(), file)
 }
 
@@ -117,6 +119,7 @@ ImportHook.prototype.hook = function hook (node) {
     files.forEach(function processFile (file) {
       add(globalState, {
         path: file.name,
+        size: file.size,
         contents: file
       })
     })

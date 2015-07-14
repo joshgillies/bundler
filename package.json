@@ -40,6 +40,8 @@
     "drag-drop": "^2.2.3",
     "global": "^4.3.0",
     "mercury": "^14.0.0",
-    "node-matrix-bundler": "joshgillies/node-matrix-bundler"
+    "node-matrix-bundler": "joshgillies/node-matrix-bundler",
+    "node-matrix-importer": "^1.1.0",
+    "pretty-bytes": "^2.0.1"
   }
 }
