@@ -1,25 +1,29 @@
 var document = require('global/document')
 var dragDrop = require('drag-drop/buffer')
+var Importer = require('node-matrix-importer')
 var Bundler = require('node-matrix-bundler')
+var sanitize = require('sanitize-filename')
 var concat = require('concat-stream')
 var hg = require('mercury')
 var h = require('mercury').h
 
 var File = require('./file.js')
-var bundle = Bundler()
 
 function Bundle (opts) {
   opts = opts || {}
 
   return hg.state({
     title: hg.value('export'),
+    path: hg.value('export'),
+    rootFolder: hg.value(true),
     files: hg.varhash(opts.files || {}, File),
     droppable: hg.value(false),
     channels: {
       add: add,
       remove: remove,
       download: download,
-      changeTitle: changeTitle
+      changeTitle: changeTitle,
+      rootFolder: rootFolder
     }
   })
 }
@@ -39,7 +43,30 @@ function remove (state, file) {
 }
 
 function download (state) {
-  Object.keys(state.files).forEach(function addFiles (file) {
+  var importer = Importer()
+  var bundle = Bundler({
+    writer: importer
+  })
+
+  var files = Object.keys(state.files)
+  var counter = files.length
+  var rootFolder
+
+  if (state.rootFolder()) {
+    rootFolder = importer.createAsset({ type: 'folder' })
+    importer.setAttribute({
+      assetId: rootFolder.id,
+      attribute: 'name',
+      value: state.title()
+    })
+    importer.addPath({
+      assetId: rootFolder.id,
+      // regex from http://stackoverflow.com/a/8485137
+      path: state.title().replace(/[^a-z0-9]/gi, '_')
+    })
+  }
+
+  files.forEach(function addFile (file) {
     file = state.files[file]
     bundle.add(file.path(), file.contents())
   })
@@ -54,6 +81,11 @@ function download (state) {
 
 function changeTitle (state, data) {
   state.title.set(data.title)
+  state.path.set(sanitize(data.title))
+}
+
+function rootFolder (state, data) {
+  state.rootFolder.set(data)
 }
 
 Bundle.render = function render (state) {
@@ -63,6 +95,11 @@ Bundle.render = function render (state) {
       value: state.title,
       name: 'title',
       'ev-event': hg.sendChange(state.channels.changeTitle)
+    }),
+    h('input', {
+      type: 'checkbox',
+      checked: state.rootFolder,
+      'ev-change': hg.send(state.channels.rootFolder, !state.rootFolder)
     }),
     h('ul', Object.keys(state.files)
       .map(function renderFile (file) {
