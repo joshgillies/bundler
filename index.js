@@ -19,7 +19,6 @@ function Bundle (opts) {
     files: hg.varhash(opts.files || {}, File),
     droppable: hg.value(false),
     channels: {
-      add: add,
       remove: remove,
       download: download,
       changeTitle: changeTitle,
@@ -106,26 +105,6 @@ Bundle.render = function render (state) {
         return File.render(state.files[file])
       })
     ),
-    h('form', {
-      'ev-event': hg.sendSubmit(state.channels.add)
-    }, [
-      h('input', {
-        type: 'text',
-        name: 'path',
-        placeholder: 'file.txt',
-        required: true
-      }),
-      h('input', {
-        type: 'text',
-        name: 'contents',
-        placeholder: 'file content',
-        required: true
-      }),
-      h('input', {
-        type: 'submit',
-        value: 'add'
-      })
-    ]),
     h('input', {
       type: 'button',
       value: 'Download!',
@@ -134,7 +113,8 @@ Bundle.render = function render (state) {
     hg.partial(function importArea (ready) {
       var attributes = {
         style: {
-          height: '100px'
+          height: '100px',
+          border: '2px dashed blue'
         }
       }
 
