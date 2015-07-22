@@ -12,7 +12,7 @@ var File = require('./file.js')
 function Bundle (opts) {
   opts = opts || {}
 
-  return hg.state({
+  var state = hg.state({
     title: hg.value('export'),
     path: hg.value('export'),
     rootFolder: hg.value(true),
@@ -25,6 +25,12 @@ function Bundle (opts) {
       rootFolder: rootFolder
     }
   })
+
+  File.onRemove.asHash(state.files, function onDestroy (ev) {
+    remove(state, ev)
+  })
+
+  return state
 }
 
 function add (state, data) {
@@ -38,7 +44,7 @@ function add (state, data) {
 }
 
 function remove (state, file) {
-  state.files.delete(file.id())
+  state.files.delete(file.id)
 }
 
 function download (state) {
@@ -102,7 +108,7 @@ Bundle.render = function render (state) {
     }),
     h('ul', Object.keys(state.files)
       .map(function renderFile (file) {
-        return File.render(state.files[file])
+        return File.render(state.files[file], state.channels)
       })
     ),
     h('input', {
