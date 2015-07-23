@@ -1,4 +1,4 @@
-var WeakmapEvent = require('mercury/examples/lib/weakmap-event')
+var WeakmapEvent = require('weakmap-event')
 var prettyBytes = require('pretty-bytes')
 var cuid = require('cuid')
 var hg = require('mercury')

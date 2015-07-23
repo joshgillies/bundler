@@ -50,6 +50,6 @@
     "node-matrix-importer": "^1.1.1",
     "pretty-bytes": "^2.0.1",
     "sanitize-filename": "^1.3.0",
-    "weakmap-shim": "^1.1.0"
+    "weakmap-event": "joshgillies/weakmap-event"
   }
 }

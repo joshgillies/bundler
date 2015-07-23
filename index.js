@@ -26,7 +26,7 @@ function Bundle (opts) {
     }
   })
 
-  File.onRemove.asHash(state.files, function onDestroy (ev) {
+  File.onRemove.toHash(state.files, function onDestroy (ev) {
     remove(state, ev)
   })
 
