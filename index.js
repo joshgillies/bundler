@@ -8,6 +8,7 @@ var hg = require('mercury')
 var h = require('mercury').h
 
 var File = require('./file.js')
+var globalState
 
 function Bundle (opts) {
   opts = opts || {}
@@ -32,6 +33,36 @@ function Bundle (opts) {
 
   return state
 }
+
+Bundle.render = function render (state) {
+  return h('div', [
+    h('input', {
+      type: 'text',
+      value: state.title,
+      name: 'title',
+      'ev-event': hg.sendChange(state.channels.changeTitle)
+    }),
+    h('input', {
+      type: 'checkbox',
+      checked: state.rootFolder,
+      'ev-change': hg.send(state.channels.rootFolder, !state.rootFolder)
+    }),
+    h('ul', Object.keys(state.files)
+      .map(function renderFile (file) {
+        return File.render(state.files[file], state.channels)
+      })
+    ),
+    h('input', {
+      type: 'button',
+      value: 'Download!',
+      'ev-click': hg.send(state.channels.download)
+    }),
+    hg.partial(importArea)
+  ])
+}
+
+// sneaky global
+globalState = Bundle()
 
 function add (state, data) {
   if (!data.size) {
@@ -93,47 +124,15 @@ function rootFolder (state, data) {
   state.rootFolder.set(data)
 }
 
-Bundle.render = function render (state) {
-  return h('div', [
-    h('input', {
-      type: 'text',
-      value: state.title,
-      name: 'title',
-      'ev-event': hg.sendChange(state.channels.changeTitle)
-    }),
-    h('input', {
-      type: 'checkbox',
-      checked: state.rootFolder,
-      'ev-change': hg.send(state.channels.rootFolder, !state.rootFolder)
-    }),
-    h('ul', Object.keys(state.files)
-      .map(function renderFile (file) {
-        return File.render(state.files[file], state.channels)
-      })
-    ),
-    h('input', {
-      type: 'button',
-      value: 'Download!',
-      'ev-click': hg.send(state.channels.download)
-    }),
-    hg.partial(function importArea (ready) {
-      var attributes = {
-        style: {
-          height: '100px',
-          border: '2px dashed blue'
-        }
-      }
-
-      if (!ready) {
-        attributes['ev-import'] = new ImportHook()
-      }
-
-      return h('div', attributes)
-    }, state.droppable)
-  ])
+function importArea () {
+  return h('div', {
+    style: {
+      height: '100px',
+      border: '2px dashed blue'
+    },
+    'ev-import': new ImportHook()
+  })
 }
-
-var globalState = Bundle()
 
 function ImportHook () {}
 
@@ -147,8 +146,6 @@ ImportHook.prototype.hook = function hook (node) {
       })
     })
   })
-
-  globalState.droppable.set(true)
 }
 
 hg.app(document.body, globalState, Bundle.render)
