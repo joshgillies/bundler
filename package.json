@@ -46,6 +46,7 @@
     "global": "^4.3.0",
     "json-globals": "^0.2.1",
     "mercury": "^14.0.0",
+    "next-tick": "^0.2.2",
     "node-matrix-bundler": "joshgillies/node-matrix-bundler",
     "node-matrix-importer": "^1.1.1",
     "pretty-bytes": "^2.0.1",
