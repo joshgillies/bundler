@@ -90,11 +90,15 @@ function download (state) {
 
   if (state.rootFolder()) {
     rootFolder = importer.createAsset({ type: 'folder' })
+
+    bundle.globalRootNode = rootFolder.id
+
     importer.setAttribute({
       assetId: rootFolder.id,
       attribute: 'name',
       value: state.title()
     })
+
     importer.addPath({
       assetId: rootFolder.id,
       // regex from http://stackoverflow.com/a/8485137
