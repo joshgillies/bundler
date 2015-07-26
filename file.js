@@ -39,16 +39,25 @@ File.onRemove = RemoveEvent.listen
 
 File.render = function render (file, parentHandles) {
   return h('li', { key: file.id }, [
-    (file.enditing ? h('input', {
-      type: 'text',
-      value: file.title || 'test',
-      name: 'title',
-      'ev-focus': file.editing ? FocusHook() : null,
-      'ev-event': hg.sendSubmit(file.channels.finishEdit),
-      'ev-blur': hg.sendValue(file.channels.finishEdit)
-    }) : (file.title ? h('span', {
-      'ev-dblclick': hg.send(file.channels.startEdit)
-    }, file.title) : null)),
+    (function isEditing () {
+      if (file.editing) {
+        return h('input', {
+          type: 'text',
+          value: file.title,
+          placeholder: 'Asset name here',
+          name: 'title',
+          'ev-focus': file.editing ? new FocusHook() : null,
+          'ev-event': hg.sendSubmit(file.channels.finishEdit),
+          'ev-blur': hg.sendValue(file.channels.finishEdit)
+        })
+      }
+
+      if (file.title) {
+        return h('span', {
+          'ev-dblclick': hg.send(file.channels.startEdit)
+        }, file.title)
+      }
+    })(),
     h('span', file.path + ' (' + prettyBytes(file.size) + ')'),
     h('input', {
       type: 'button',
