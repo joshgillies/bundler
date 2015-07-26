@@ -20,7 +20,6 @@ function File (opts) {
     contents: hg.value(opts.contents || ''),
     channels: {
       startEdit: function startEdit (state) {
-        console.log(state.editing())
         state.editing.set(true)
       },
       finishEdit: function finishEdit (state, data) {
