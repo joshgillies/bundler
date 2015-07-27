@@ -88,6 +88,15 @@ function download (state) {
   var counter = files.length
   var rootFolder
 
+  function createBundle () {
+    bundle.createBundle().pipe(concat(function downloadBundle (buf) {
+      var link = document.createElement('a')
+      link.href = 'data:application/gzip;base64,' + buf.toString('base64')
+      link.download = state.title() + '.tgz'
+      link.click()
+    }))
+  }
+
   if (state.rootFolder()) {
     rootFolder = importer.createAsset({ type: 'folder' })
 
@@ -108,15 +117,29 @@ function download (state) {
 
   files.forEach(function addFile (file) {
     file = state.files[file]
+
+    importer.once('create_file_asset', function setAttributes (asset) {
+      if (file.title()) {
+        importer.setAttribute({
+          assetId: asset.id,
+          attribute: 'name',
+          value: file.title()
+        })
+        importer.setAttribute({
+          assetId: asset.id,
+          attribute: 'short_name',
+          value: file.title()
+        })
+      }
+
+      if (!--counter) {
+        createBundle()
+      }
+    })
+
     bundle.add(file.path(), file.contents())
   })
 
-  bundle.createBundle().pipe(concat(function downloadBundle (buf) {
-    var link = document.createElement('a')
-    link.href = 'data:application/gzip;base64,' + buf.toString('base64')
-    link.download = state.title() + '.tgz'
-    link.click()
-  }))
 }
 
 function changeTitle (state, data) {
