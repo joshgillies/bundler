@@ -86,60 +86,65 @@ function download (state) {
 
   var files = Object.keys(state.files)
   var counter = files.length
-  var rootFolder
 
-  function createBundle () {
-    bundle.createBundle().pipe(concat(function downloadBundle (buf) {
-      var link = document.createElement('a')
-      link.href = 'data:application/gzip;base64,' + buf.toString('base64')
-      link.download = state.title() + '.tgz'
-      link.click()
-    }))
+  function setAttributes (id, attributes) {
+    for (var attribute in attributes) {
+      importer.setAttribute({
+        assetId: id,
+        attribute: attribute,
+        value: attributes[attribute]
+      })
+    }
   }
 
-  if (state.rootFolder()) {
-    rootFolder = importer.createAsset({ type: 'folder' })
+  function downloadBundle (buf) {
+    var link = document.createElement('a')
+    link.href = 'data:application/gzip;base64,' + buf.toString('base64')
+    link.download = state.title() + '.tgz'
+    link.click()
+  }
 
-    bundle.globalRootNode = rootFolder.id
+  function createRootFolder (title) {
+    var folder = importer.createAsset({ type: 'folder' })
 
-    importer.setAttribute({
-      assetId: rootFolder.id,
-      attribute: 'name',
-      value: state.title()
+    bundle.globalRootNode = folder.id
+
+    setAttributes(folder.id, {
+      name: title,
+      short_name: title
     })
 
     importer.addPath({
-      assetId: rootFolder.id,
+      assetId: folder.id,
       // regex from http://stackoverflow.com/a/8485137
-      path: state.title().replace(/[^a-z0-9]/gi, '_')
+      path: title.replace(/[^a-z0-9]/gi, '_')
     })
   }
 
-  files.forEach(function addFile (file) {
-    file = state.files[file]
-
-    importer.once('create_file_asset', function setAttributes (asset) {
-      if (file.title()) {
-        importer.setAttribute({
-          assetId: asset.id,
-          attribute: 'name',
-          value: file.title()
-        })
-        importer.setAttribute({
-          assetId: asset.id,
-          attribute: 'short_name',
-          value: file.title()
+  function addToBundle (file) {
+    importer.once('create_file_asset', function setFileAttributes (asset) {
+      if (file.title) {
+        setAttributes(asset.id, {
+          name: file.title,
+          short_name: file.title
         })
       }
 
       if (!--counter) {
-        createBundle()
+        bundle.createBundle().pipe(concat(downloadBundle))
       }
     })
 
-    bundle.add(file.path(), file.contents())
-  })
+    bundle.add(file.path, file.contents)
+  }
 
+  if (state.rootFolder()) {
+    createRootFolder(state.title())
+  }
+
+  files.forEach(function processFile (file) {
+    addToBundle(state.files[file]())
+  })
 }
 
 function changeTitle (state, data) {
