@@ -135,7 +135,9 @@ function download (state) {
       }
     })
 
-    bundle.add(file.path, file.contents)
+    bundle.add(file.path, file.contents, {
+      link: file.linkType
+    })
   }
 
   if (state.rootFolder()) {

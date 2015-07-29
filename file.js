@@ -16,11 +16,15 @@ function File (opts) {
     path: hg.value(opts.path || ''),
     editing: hg.value(opts.editing || false),
     title: hg.value(opts.title || ''),
+    linkType: hg.value('type_1'),
     size: hg.value(opts.size || 0),
     contents: hg.value(opts.contents || ''),
     channels: {
       startEdit: function startEdit (state) {
         state.editing.set(true)
+      },
+      setLinkType: function setLinkType (state, data) {
+        state.linkType.set(data.type)
       },
       finishEdit: function finishEdit (state, data) {
         if (state.editing() === false) {
@@ -64,6 +68,17 @@ File.render = function render (file, parentHandles) {
       name: 'edit',
       'ev-click': hg.send(file.channels.startEdit)
     }),
+    h('select', {
+      name: 'type',
+      'ev-event': hg.sendChange(file.channels.setLinkType)
+    }, [
+      h('option', {
+        value: 'type_1'
+      }, 'TYPE_1'),
+      h('option', {
+        value: 'type_2'
+      }, 'TYPE_2')
+    ]),
     h('input', {
       type: 'button',
       value: 'Remove',
