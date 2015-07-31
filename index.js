@@ -123,12 +123,18 @@ function download (state) {
 
   function addToBundle (file) {
     importer.once('create_file_asset', function setFileAttributes (asset) {
+      var attributes = {}
+
       if (file.title) {
-        setAttributes(asset.id, {
-          name: file.title,
-          short_name: file.title
-        })
+        attributes['name'] = file.title
+        attributes['short_name'] = file.title
       }
+
+      if (file.unrestrictedAccess) {
+        attributes['allow_unrestricted'] = file.unrestrictedAccess
+      }
+
+      setAttributes(asset.id, attributes)
 
       if (!--counter) {
         bundle.createBundle().pipe(concat(downloadBundle))

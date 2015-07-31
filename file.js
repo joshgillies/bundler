@@ -17,11 +17,15 @@ function File (opts) {
     editing: hg.value(opts.editing || false),
     title: hg.value(opts.title || ''),
     linkType: hg.value('type_1'),
+    unrestrictedAccess: hg.value(false),
     size: hg.value(opts.size || 0),
     contents: hg.value(opts.contents || ''),
     channels: {
       startEdit: function startEdit (state) {
         state.editing.set(true)
+      },
+      setAccess: function setAccess (state, access) {
+        state.unrestrictedAccess.set(access)
       },
       setLinkType: function setLinkType (state, data) {
         state.linkType.set(data.type)
@@ -79,6 +83,11 @@ File.render = function render (file, parentHandles) {
         value: 'type_2'
       }, 'TYPE_2')
     ]),
+    h('input', {
+      type: 'checkbox',
+      checked: file.unrestrictedAccess,
+      'ev-change': hg.send(file.channels.setAccess, !file.unrestrictedAccess)
+    }),
     h('input', {
       type: 'button',
       value: 'Remove',
