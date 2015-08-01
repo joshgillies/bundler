@@ -18,7 +18,6 @@ function Bundle (opts) {
     path: hg.value('export'),
     rootFolder: hg.value(true),
     files: hg.varhash(opts.files || {}, File),
-    droppable: hg.value(false),
     channels: {
       remove: remove,
       download: download,
