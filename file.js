@@ -1,12 +1,9 @@
-var WeakmapEvent = require('weakmap-event')
 var document = require('global/document')
 var prettyBytes = require('pretty-bytes')
 var nextTick = require('next-tick')
 var cuid = require('cuid')
 var hg = require('mercury')
 var h = require('mercury').h
-
-var RemoveEvent = WeakmapEvent()
 
 function File (opts) {
   opts = opts || {}
@@ -41,8 +38,6 @@ function File (opts) {
     }
   })
 }
-
-File.onRemove = RemoveEvent.listen
 
 File.render = function render (file, parentHandles) {
   return h('li', { key: file.id }, [
