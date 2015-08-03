@@ -1,3 +1,4 @@
+var fileType = require('node-matrix-bundler')
 var document = require('global/document')
 var prettyBytes = require('pretty-bytes')
 var nextTick = require('next-tick')
@@ -13,6 +14,7 @@ function File (opts) {
     path: hg.value(opts.path || ''),
     editing: hg.value(opts.editing || false),
     title: hg.value(opts.title || ''),
+    type: hg.value(fileType(opts.path)),
     linkType: hg.value('type_1'),
     unrestrictedAccess: hg.value(false),
     size: hg.value(opts.size || 0),
