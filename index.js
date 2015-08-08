@@ -8,6 +8,7 @@ var hg = require('mercury')
 var h = require('mercury').h
 
 var File = require('./file.js')
+var Folder = require('./folder.js')
 var globalState
 
 function Bundle (opts) {
@@ -17,6 +18,7 @@ function Bundle (opts) {
     title: hg.value('export'),
     path: hg.value('export'),
     rootFolder: hg.value(true),
+    folders: hg.varhash(opts.folders || {}, Folder),
     files: hg.varhash(opts.files || {}, File),
     channels: {
       remove: remove,
