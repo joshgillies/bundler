@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "budo index.js:bundle.js -v --live | opnr | garnish",
+    "deploy": "standard && gh-pages-deploy",
     "fast-boot": "node scripts/fastboot.js index.js > index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -34,6 +35,7 @@
     "doctypes": "^1.0.0",
     "falafel": "^1.2.0",
     "garnish": "^2.1.3",
+    "gh-pages-deploy": "^0.3.0",
     "minimist": "^1.1.1",
     "opnr": "^1.0.4",
     "vdom-to-html": "^2.1.1"
