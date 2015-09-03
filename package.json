@@ -30,7 +30,7 @@
   "homepage": "https://github.com/joshgillies/bundler",
   "devDependencies": {
     "babelify": "^6.1.2",
-    "browserify": "^10.2.4",
+    "browserify": "^11.0.1",
     "budo": "^4.1.0",
     "doctypes": "^1.0.0",
     "falafel": "^1.2.0",
