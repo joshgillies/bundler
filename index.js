@@ -4,6 +4,7 @@ var Importer = require('node-matrix-importer')
 var Bundler = require('node-matrix-bundler')
 var sanitize = require('sanitize-filename')
 var concat = require('concat-stream')
+var slug = require('slug')
 var hg = require('mercury')
 var h = require('mercury').h
 
@@ -113,8 +114,7 @@ function download (state) {
 
     importer.addPath({
       assetId: folder.id,
-      // regex from http://stackoverflow.com/a/8485137
-      path: title.replace(/[^a-z0-9]/gi, '_')
+      path: slug(title, '_')
     })
   }
 
